@@ -4,4 +4,4 @@ pytesseract
 tesseract
 tesseract-ocr
 
-apt-get install tesseract-ocr
+/home/appuser/venv/bin/python -m pip install --upgrade pip
