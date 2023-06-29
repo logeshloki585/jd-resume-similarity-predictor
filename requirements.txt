@@ -1,7 +1,4 @@
 scikit-learn
 nltk
 pytesseract
-tesseract
 tesseract-ocr
-
-/home/appuser/venv/bin/python -m pip install --upgrade pip
