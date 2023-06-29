@@ -1,4 +1,3 @@
 scikit-learn
 nltk
 pytesseract
-tesseract-ocr
