@@ -6,12 +6,14 @@ from nltk.tokenize import word_tokenize
 from nltk.corpus import stopwords
 from nltk.stem import WordNetLemmatizer
 import nltk
-import re
-nltk.download('wordnet')
-nltk.download('punkt')
-nltk.download('stopwords')
+# nltk.download('wordnet')
+# nltk.download('punkt')
+# nltk.download('stopwords')
 from PIL import Image
 import pytesseract
+import requests
+import re
+import json
 
 
 def main():
@@ -19,6 +21,18 @@ def main():
         image = Image.open(image)
         text = pytesseract.image_to_string(image)
         return text
+
+    def get_entity(text):
+        resume_data = []
+        include = 'extract named entity'
+        # YOUR_TOKEN = "f69b378878d141f29f40aaaf093e5600"
+        url = f'https://api.dandelion.eu/datatxt/nex/v1/?include={include}&text={text}&token=f69b378878d141f29f40aaaf093e5600'
+        # print(url)
+        response = requests.get(url)
+        data = json.loads(response.text)
+        for i in data['annotations']:
+            resume_data.append(i['spot'])
+        return (resume_data)
 
     def cosine(r_list):
         cv = CountVectorizer()
@@ -29,7 +43,7 @@ def main():
 
 
     def preprocessing(text):
-
+        data = ''
         text_p = re.sub(r'[^\w\s]', '', text)
         tokens = nltk.word_tokenize(text_p)
         stop_words = set(stopwords.words('english'))
@@ -40,7 +54,9 @@ def main():
         lemmatizer = WordNetLemmatizer()
         lemmatized_words = [lemmatizer.lemmatize(words) for words in without_stop_words]
         final_text = [x for i, x in enumerate(lemmatized_words) if x not in lemmatized_words[:i]]
-        return final_text
+        for i in final_text:
+            data = data + ' ' + i
+        return data
 
     st.title("HTML Input Example")
 
@@ -63,10 +79,15 @@ def main():
         temp = []
         # Call the function when the button is clicked
         uncleaned_text =extract_text(uploaded_file)
+
         cleaned_text_resume=preprocessing(uncleaned_text)
         cleaned_text_jd = preprocessing(user_input)
-        temp.append(cleaned_text_resume)
-        temp.append(cleaned_text_jd)
+
+        entity_of_resume = get_entity(cleaned_text_resume)
+        entity_of_jd = get_entity(cleaned_text_jd)
+
+        temp.append(entity_of_resume)
+        temp.append(entity_of_jd)
         percentage = cosine(temp)
         st.write(percentage)
 
