@@ -4,3 +4,4 @@ pytesseract
 streamlit
 tesseract
 tesseract-ocr
+tesseract-ocr-por
