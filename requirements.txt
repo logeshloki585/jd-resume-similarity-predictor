@@ -3,3 +3,4 @@ nltk
 pytesseract
 streamlit
 tesseract
+tesseract-ocr
