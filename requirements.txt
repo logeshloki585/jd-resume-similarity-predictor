@@ -1,6 +1,5 @@
 scikit-learn
 nltk
 pytesseract
-streamlit
 tesseract
 tesseract-ocr
