@@ -2,5 +2,3 @@ scikit-learn
 nltk
 pytesseract
 streamlit
-re
-PIL
