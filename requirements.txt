@@ -3,3 +3,5 @@ nltk
 pytesseract
 tesseract
 tesseract-ocr
+
+apt-get install tesseract-ocr
