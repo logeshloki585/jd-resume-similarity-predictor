@@ -1,1 +1,0 @@
-GPT_API_KEY = "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"

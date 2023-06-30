@@ -14,8 +14,12 @@ import pytesseract
 import requests
 import re
 import json
-import secret
 import openai
+from dotenv import load_dotenv
+import os
+
+load_dotenv()
+
 
 def main():
     def extract_text(image):
@@ -25,7 +29,8 @@ def main():
 
     def extract_skills_experience(resume,jd):
         text = "resume :" + resume + "job description :"+ jd
-        openai.api_key = secret.GPT_API_KEY
+        openai.api_key = os.getenv('GPT_API_KEY')
+        print(openai.api_key)
         prompt = "give me only the percentage of similarity for this resume and job descrption:\n\n" + text + "\n\n---\n\nInput:"
         response = openai.Completion.create(
             engine="text-davinci-003",
