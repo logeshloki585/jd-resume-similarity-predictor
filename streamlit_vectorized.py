@@ -17,6 +17,7 @@ import json
 import openai
 from dotenv import load_dotenv
 import os
+from sentence_transformers import SentenceTransformer
 
 load_dotenv()
 
@@ -29,7 +30,7 @@ def main():
 
 
     def get_entity(text):
-        resume_data = []
+        temp = ''
         include = 'extract named entity'
         # YOUR_TOKEN = "f69b378878d141f29f40aaaf093e5600"
         url = f'https://api.dandelion.eu/datatxt/nex/v1/?include={include}&text={text}&token=f69b378878d141f29f40aaaf093e5600'
@@ -37,16 +38,24 @@ def main():
         response = requests.get(url)
         data = json.loads(response.text)
         for i in data['annotations']:
-            resume_data.append(i['spot'])
-        return (resume_data)
+            temp = temp + " " + str(i)
+        return (temp)
 
-    def cosine(r_list):
-        cv = CountVectorizer()
-        matrix = cv.fit_transform([' '.join(lst) for lst in r_list])
-        cos_sim = cosine_similarity(matrix)
-        similarity_rate = cos_sim[0][1] * 100
-        return (f"Similarity Rate: {similarity_rate:.2f}%")
+    def calculate_similarity(paragraph1, paragraph2):
+        # Load a pre-trained BERT-based model
+        model = SentenceTransformer('bert-base-nli-mean-tokens')
 
+        # Encode the paragraphs into sentence embeddings
+        embedding1 = model.encode([paragraph1])
+        embedding2 = model.encode([paragraph2])
+
+        # Calculate the cosine similarity between the embeddings
+        similarity = cosine_similarity(embedding1, embedding2)[0][0]
+
+        # Convert the similarity to a percentage
+        similarity_percentage = round(similarity * 100, 2)
+
+        return similarity_percentage
 
     def preprocessing(text):
         data = ''
@@ -105,10 +114,8 @@ def main():
         entity_of_resume = get_entity(cleaned_text_resume)
         entity_of_jd = get_entity(cleaned_text_jd)
 
-        temp.append(entity_of_resume)
-        temp.append(entity_of_jd)
-        st.write(temp)
-        percentage = cosine(temp)
+
+        percentage = calculate_similarity(entity_of_resume,entity_of_jd)
 
         st.write(percentage)
 
