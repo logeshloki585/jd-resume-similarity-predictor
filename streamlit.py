@@ -14,13 +14,28 @@ import pytesseract
 import requests
 import re
 import json
-
+import secret
+import openai
 
 def main():
     def extract_text(image):
         image = Image.open(image)
         text = pytesseract.image_to_string(image)
         return text
+
+    def extract_skills_experience(resume,jd):
+        text = "resume :" + resume + "job description :"+ jd
+        openai.api_key = secret.GPT_API_KEY
+        prompt = "give me only the percentage of similarity for this resume and job descrption:\n\n" + text + "\n\n---\n\nInput:"
+        response = openai.Completion.create(
+            engine="text-davinci-003",
+            prompt=prompt,
+            max_tokens=300,
+            temperature=0.3,
+            n=1,
+            stop=None
+        )
+        return response.choices[0].text.strip()
 
     def get_entity(text):
         resume_data = []
@@ -58,7 +73,7 @@ def main():
             data = data + ' ' + i
         return data
 
-    st.title("HTML Input Example")
+    st.header("RESUME - JOB DESCRIPTION ANALYZER")
 
     col1, col2 = st.columns(2)
 
@@ -67,28 +82,29 @@ def main():
     with col1:
         st.markdown('<style>div.file_input.UploadFile > label{height: 200px !important;}</style>',
                     unsafe_allow_html=True)
-        uploaded_file = st.file_uploader("Choose a PDF file", type="png")
+        uploaded_file = st.file_uploader("UPLOAD RESUME", type=None)
 
     # Column 2: PDF file uploader
     with col2:
         st.markdown('<style>div.Widget.row-widget.stRadio > label{height: 200px !important;}</style>',
                     unsafe_allow_html=True)
-        user_input = st.text_input("Enter your name", "John Doe", key='text_input')
+        user_input_jd = st.text_input("ENTER JOB-DESCRIPTION", "", key='text_input')
 
     if st.button("Submit"):
         temp = []
         # Call the function when the button is clicked
         uncleaned_text =extract_text(uploaded_file)
 
-        cleaned_text_resume=preprocessing(uncleaned_text)
-        cleaned_text_jd = preprocessing(user_input)
-
-        entity_of_resume = get_entity(cleaned_text_resume)
-        entity_of_jd = get_entity(cleaned_text_jd)
-
-        temp.append(entity_of_resume)
-        temp.append(entity_of_jd)
-        percentage = cosine(temp)
+        # cleaned_text_resume=preprocessing(uncleaned_text)
+        # cleaned_text_jd = preprocessing(user_input)
+        #
+        # entity_of_resume = get_entity(cleaned_text_resume)
+        # entity_of_jd = get_entity(cleaned_text_jd)
+        #
+        # temp.append(entity_of_resume)
+        # temp.append(entity_of_jd)
+        # percentage = cosine(temp)
+        percentage = extract_skills_experience(uncleaned_text,user_input_jd)
         st.write(percentage)
 
 
