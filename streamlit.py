@@ -27,21 +27,6 @@ def main():
         text = pytesseract.image_to_string(image)
         return text
 
-    def extract_skills_experience(resume,jd):
-        text = "resume :" + resume + "job description :"+ jd
-        openai.api_key = os.getenv('GPT_API_KEY')
-
-        print(openai.api_key)
-        prompt = "give me only the percentage of similarity for this resume and job descrption:\n\n" + text + "\n\n---\n\nInput:"
-        response = openai.Completion.create(
-            engine="text-davinci-003",
-            prompt=prompt,
-            max_tokens=300,
-            temperature=0.3,
-            n=1,
-            stop=None
-        )
-        return response.choices[0].text.strip()
 
     def get_entity(text):
         resume_data = []
@@ -101,16 +86,16 @@ def main():
         # Call the function when the button is clicked
         uncleaned_text =extract_text(uploaded_file)
 
-        # cleaned_text_resume=preprocessing(uncleaned_text)
-        # cleaned_text_jd = preprocessing(user_input)
-        #
-        # entity_of_resume = get_entity(cleaned_text_resume)
-        # entity_of_jd = get_entity(cleaned_text_jd)
-        #
-        # temp.append(entity_of_resume)
-        # temp.append(entity_of_jd)
-        # percentage = cosine(temp)
-        percentage = extract_skills_experience(uncleaned_text,user_input_jd)
+        cleaned_text_resume=preprocessing(uncleaned_text)
+        cleaned_text_jd = preprocessing(user_input_jd)
+
+        entity_of_resume = get_entity(cleaned_text_resume)
+        entity_of_jd = get_entity(cleaned_text_jd)
+
+        temp.append(entity_of_resume)
+        temp.append(entity_of_jd)
+        percentage = cosine(temp)
+
         st.write(percentage)
 
 
