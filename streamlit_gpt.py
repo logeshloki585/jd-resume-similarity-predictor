@@ -50,6 +50,19 @@ def main():
                     unsafe_allow_html=True)
         user_input_jd = st.text_input("ENTER JOB-DESCRIPTION", "", key='text_input')
 
+    hide_footer_html = """
+        <style>
+        .css-cio0dv {
+            visibility: hidden;
+        }
+        .css-14xtw13 {
+            visibility: hidden;
+        }
+        </style>
+        """
+
+    st.markdown(hide_footer_html, unsafe_allow_html=True)
+
     if st.button("Submit"):
 
         uncleaned_text =extract_text(uploaded_file)
