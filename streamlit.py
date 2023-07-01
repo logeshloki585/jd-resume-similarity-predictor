@@ -6,14 +6,15 @@ from nltk.tokenize import word_tokenize
 from nltk.corpus import stopwords
 from nltk.stem import WordNetLemmatizer
 import nltk
-# nltk.download('wordnet')
-# nltk.download('punkt')
-# nltk.download('stopwords')
+nltk.download('wordnet')
+nltk.download('punkt')
+nltk.download('stopwords')
 from PIL import Image
 import pytesseract
 import requests
 import re
 import json
+import requests
 import openai
 from dotenv import load_dotenv
 import os
@@ -39,6 +40,14 @@ def main():
         for i in data['annotations']:
             resume_data.append(i['spot'])
         return (resume_data)
+
+    def check_similarity_api(text_1, text_2):
+        body = {'text_1': text_1, 'text_2': text_2}
+        api_url = 'https://api.api-ninjas.com/v1/textsimilarity'
+        response = requests.post(api_url, headers={'X-Api-Key': 'uQQ5Ghfqf0WPpZWzdL8ykA==Ab6z9TEW1xffQd5I'}, json=body)
+        value = json.loads(response.text)
+        percentage = value['similarity']
+        return percentage
 
     def cosine(r_list):
         cv = CountVectorizer()
@@ -79,7 +88,7 @@ def main():
     with col2:
         st.markdown('<style>div.Widget.row-widget.stRadio > label{height: 200px !important;}</style>',
                     unsafe_allow_html=True)
-        user_input_jd = st.text_input("ENTER JOB-DESCRIPTION", "", key='text_input')
+        user_input_jd = st.text_area("ENTER JOB-DESCRIPTION", "", key='text_input')
 
     hide_footer_html = """
     <style>
@@ -102,14 +111,15 @@ def main():
         cleaned_text_resume=preprocessing(uncleaned_text)
         cleaned_text_jd = preprocessing(user_input_jd)
 
-        entity_of_resume = get_entity(cleaned_text_resume)
-        entity_of_jd = get_entity(cleaned_text_jd)
+        # entity_of_resume = get_entity(cleaned_text_resume)
+        # entity_of_jd = get_entity(cleaned_text_jd)
 
-        temp.append(entity_of_resume)
-        temp.append(entity_of_jd)
-        st.write(temp)
-        percentage = cosine(temp)
 
+
+        # temp.append(entity_of_resume)
+        # temp.append(entity_of_jd)
+        # st.write(temp)
+        percentage = check_similarity_api(cleaned_text_resume,cleaned_text_jd)
         st.write(percentage)
 
 
