@@ -28,9 +28,8 @@ def main():
         text = pytesseract.image_to_string(image)
         return text
 
-
     def get_entity(text):
-        resume_data = []
+        temp = ''
         include = 'extract named entity'
         # YOUR_TOKEN = "f69b378878d141f29f40aaaf093e5600"
         url = f'https://api.dandelion.eu/datatxt/nex/v1/?include={include}&text={text}&token=f69b378878d141f29f40aaaf093e5600'
@@ -38,14 +37,15 @@ def main():
         response = requests.get(url)
         data = json.loads(response.text)
         for i in data['annotations']:
-            resume_data.append(i['spot'])
-        return (resume_data)
+            temp = temp + " " + i['spot']
+        return (temp)
 
     def check_similarity_api(text_1, text_2):
         body = {'text_1': text_1, 'text_2': text_2}
         api_url = 'https://api.api-ninjas.com/v1/textsimilarity'
         response = requests.post(api_url, headers={'X-Api-Key': 'uQQ5Ghfqf0WPpZWzdL8ykA==Ab6z9TEW1xffQd5I'}, json=body)
         value = json.loads(response.text)
+
         percentage = value['similarity']
         return percentage
 
@@ -104,25 +104,17 @@ def main():
     st.markdown(hide_footer_html, unsafe_allow_html=True)
 
     if st.button("Submit"):
-        temp = []
-        # Call the function when the button is clicked
+
         uncleaned_text =extract_text(uploaded_file)
 
         cleaned_text_resume=preprocessing(uncleaned_text)
         cleaned_text_jd = preprocessing(user_input_jd)
 
-        # entity_of_resume = get_entity(cleaned_text_resume)
-        # entity_of_jd = get_entity(cleaned_text_jd)
+        entity_of_resume = get_entity(cleaned_text_resume)
+        entity_of_jd = get_entity(cleaned_text_jd)
 
-
-
-        # temp.append(entity_of_resume)
-        # temp.append(entity_of_jd)
-        # st.write(temp)
-        percentage = check_similarity_api(cleaned_text_resume,cleaned_text_jd)
-        st.write(percentage)
-
-
+        percentage = check_similarity_api(entity_of_resume,entity_of_jd) * 100
+        st.write("similarity : " + str(percentage)+"%")
 
 
 if __name__ == "__main__":
