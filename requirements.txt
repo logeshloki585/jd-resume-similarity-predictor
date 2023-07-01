@@ -4,3 +4,5 @@ pytesseract
 openai
 python-dotenv
 sentence_transformers
+requests
+json
